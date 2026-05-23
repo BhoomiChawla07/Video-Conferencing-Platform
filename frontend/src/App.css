@@ -1,0 +1,304 @@
+ * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.landing-page {
+  height: 100vh;
+  width: 100vw;
+  background : url("/public/background.png");  
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: white;
+
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+}
+
+.heading h2 {
+  font-size: 30px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 40px;
+}
+
+.nav-links a, .nav-links div {
+  text-decoration: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.nav-links div,
+.nav-links a {
+  padding: 8px 22px;
+  border-radius: 999px;
+  background-color: rgba(255, 152, 57, 0.95);
+}
+
+.nav-links a {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+
+.nav-links a:hover, .nav-links div:hover {
+  color: #ddd;
+}
+
+.landingMainContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-height: 75vh;
+  padding: 80px 80px 40px;
+  padding-top: 12vh;
+}
+
+.landingMainContainer > div:nth-child(1) {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 540px;
+}
+.landingMainContainer > div:nth-child(1) h1 {
+  font-size: clamp(3rem, 4vw, 5rem);
+  line-height: 1.05;
+}
+
+.landingMainContainer > div:nth-child(1) p {
+  font-size: 1.1rem;
+  color: #ddd;
+}
+
+.landingMainContainer > div:nth-child(1) div[role="button"]  {
+  width: 190px;
+  padding: 10px 40px;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  background-color: #ff9839;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.landingMainContainer > div:nth-child(1) div[role="button"] a {
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: white;
+  
+}
+
+.landingMainContainer > div:nth-child(1) div[role="button"]:hover {
+  background-color: #ff7a00;
+}
+
+
+.landingMainContainer > div:nth-child(2) img {
+  max-width: 600px;
+  width: 100%;
+  height: auto;
+}
+
+/* Home Component */
+
+.navBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 20px;
+  text-align: center;
+
+}
+.meetContainer {
+  display: flex;
+  padding-inline: 20px;
+  height: 80vh;
+  gap: 10vw;
+  justify-content: center;
+}
+
+
+
+.leftPanel {
+  height: 100%;
+  display: flex;
+  align-items: center;
+
+}
+
+.rightPanel {
+  display: flex;
+  align-items: center;
+}
+
+.rightPanel > img {
+  width: 100%;
+  max-width: 540px;
+  height: auto;
+  border-radius: 24px;
+}
+
+.homePage {
+  padding: 32px 28px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f4f8ff 0%, #ffffff 100%);
+}
+
+.homePage .navBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 32px;
+  padding: 12px 0;
+}
+
+.homePage .brand {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.homePage .brand h4,
+.homePage .brand h2 {
+  margin: 0;
+}
+
+.homePage .navActions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.heroRow {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.heroCard,
+.infoCard {
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.heroCard {
+  background: linear-gradient(135deg, #ffffff 0%, #e8f0fa 100%);
+}
+
+.heroCard .MuiCardContent-root,
+.infoCard .MuiCardContent-root {
+  padding: 28px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.infoCard {
+  background: #ffffff;
+  min-height: 120px;
+}
+
+.infoCard .MuiTypography-root {
+  line-height: 1.3;
+}
+
+.meetContainer {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.2fr) minmax(360px, 1fr);
+  gap: 32px;
+  align-items: center;
+}
+
+.leftPanel {
+  display: flex;
+  min-height: 420px;
+}
+
+.leftPanel .MuiCardContent-root {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.rightPanel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.homePreviewImage {
+  width: 100%;
+  max-width: 640px;
+  height: auto;
+  border-radius: 28px;
+  box-shadow: 0 26px 60px rgba(58, 96, 198, 0.14);
+}
+
+.joinControls {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.buttonGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.homePage .MuiButton-root {
+  min-width: 150px;
+}
+
+.historyPage {
+  padding: 28px;
+  min-height: 100vh;
+  background: #f4f7fb;
+}
+
+.historyHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 18px;
+}
+
+@media (max-width: 980px) {
+  .heroRow,
+  .meetContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .heroRow {
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 680px) {
+  .homePage {
+    padding: 20px 18px;
+  }
+
+  .homePreviewImage {
+    max-width: 100%;
+  }
+}
+  

@@ -16,14 +16,14 @@ const app = express();
 const httpServer = createServer(app);
 const io = connectToSocket(httpServer, {
     cors: {
-        origin: 'http://localhost:3000',
+        origin: 'https://video-conferencing-frontend-l4ep.onrender.com',
         methods: ['GET', 'POST'],
     },
 });
 
 app.set('port', process.env.PORT || 8000);
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: 'https://video-conferencing-frontend-l4ep.onrender.com',
     credentials: true,
 }));
 app.use(express.json({limit: '40kb'}));

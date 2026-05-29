@@ -20,12 +20,54 @@ export default function Authentication() {
     const [username, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [name, setName] = React.useState('');
+    const [otp, setOtp] = React.useState('');
+    const [otpSent, setOtpSent] = React.useState(false);
     const [error, setError] = React.useState('');
     const [message, setMessage] = React.useState('');
     const [formState, setFormState] = React.useState(0);
     const [open, setOpen] = React.useState(false);
+    const [loading, setLoading] = React.useState(false);
 
-    const { handleRegister, handleLogin } = React.useContext(AuthContext);
+    const { sendRegistrationOtp, verifyRegistrationOtp, handleLogin } = React.useContext(AuthContext);
+
+    const handleSendOtp = async () => {
+        try {
+            setError('');
+            setLoading(true);
+            const result = await sendRegistrationOtp(name, username, password);
+            setOtpSent(true);
+            setMessage(result || 'OTP sent to your email address.');
+            setOpen(true);
+        } catch (err) {
+            console.error(err);
+            const apiMessage = err?.response?.data?.message;
+            setError(apiMessage || 'Unable to send OTP. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleVerifyOtp = async () => {
+        try {
+            setError('');
+            setLoading(true);
+            const result = await verifyRegistrationOtp(username, otp);
+            setUsername('');
+            setName('');
+            setPassword('');
+            setOtp('');
+            setOtpSent(false);
+            setMessage(result || 'Your account has been verified and created successfully.');
+            setOpen(true);
+            setFormState(0);
+        } catch (err) {
+            console.error(err);
+            const apiMessage = err?.response?.data?.message;
+            setError(apiMessage || 'Unable to verify OTP. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleAuth = async () => {
         try {
@@ -34,13 +76,11 @@ export default function Authentication() {
                 await handleLogin(username, password);
                 return;
             }
-            const result = await handleRegister(name, username, password);
-            setUsername('');
-            setName('');
-            setPassword('');
-            setMessage(result || 'Your account has been created successfully.');
-            setOpen(true);
-            setFormState(0);
+            if (!otpSent) {
+                await handleSendOtp();
+                return;
+            }
+            await handleVerifyOtp();
         } catch (err) {
             console.error(err);
             const apiMessage = err?.response?.data?.message;
@@ -80,7 +120,12 @@ export default function Authentication() {
 
                         <Tabs
                             value={formState}
-                            onChange={(event, newValue) => setFormState(newValue)}
+                            onChange={(event, newValue) => {
+                                setFormState(newValue);
+                                setOtpSent(false);
+                                setOtp('');
+                                setError('');
+                            }}
                             variant="fullWidth"
                             textColor="primary"
                             indicatorColor="primary"
@@ -109,7 +154,7 @@ export default function Authentication() {
                                 required
                                 fullWidth
                                 id="username"
-                                label="Username"
+                                label="Email Address"
                                 name="username"
                                 value={username}
                                 autoFocus={formState === 0}
@@ -127,6 +172,19 @@ export default function Authentication() {
                                 onChange={(e) => setPassword(e.target.value)}
                             />
 
+                            {formState === 1 && otpSent && (
+                                <TextField
+                                    margin="normal"
+                                    required
+                                    fullWidth
+                                    name="otp"
+                                    label="Enter OTP"
+                                    id="otp"
+                                    value={otp}
+                                    onChange={(e) => setOtp(e.target.value)}
+                                />
+                            )}
+
                             {error && (
                                 <Typography color="error" sx={{ mt: 2, mb: 1 }}>
                                     {error}
@@ -137,10 +195,11 @@ export default function Authentication() {
                                 type="button"
                                 fullWidth
                                 variant="contained"
+                                disabled={loading}
                                 sx={{ mt: 3, mb: 1, py: 1.3 }}
                                 onClick={handleAuth}
                             >
-                                {formState === 0 ? 'Login' : 'Register'}
+                                {formState === 0 ? 'Login' : otpSent ? 'Verify OTP' : 'Send OTP'}
                             </Button>
 
                             <Typography variant="body2" color="text.secondary" align="center">

@@ -6,8 +6,13 @@ import server from "../environment";
 export const AuthContext = createContext();
 
 const client = axios.create({
-    baseURL: `${server.prod}/api/v1/users`,
-    withCredentials: true
+    baseURL: `${server}/api/v1/users`,
+    withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+    },
+    timeout: 10000, // 10 second timeout
 })
 
 export const AuthProvider = ({ children }) => {
@@ -28,17 +33,64 @@ export const AuthProvider = ({ children }) => {
                 name: name,
                 username: username,
                 password: password
-            }) 
+            })
             if (response.status === 201) {
                 return response.data.message;
             }
-            
         }
         catch (err) {
             console.log(err);
             throw err;
         }
     }
+
+    const sendRegistrationOtp = async (name, username, password) => {
+        try {
+            const response = await client.post("/register/request-otp", {
+                name,
+                username,
+                password,
+            });
+            if (response.status === 200) {
+                return response.data.message;
+            }
+        } catch (err) {
+            // Axios “Network Error” often means: unreachable server, CORS blocked, or blocked mixed-content.
+            // Log enough details to differentiate without changing API behavior.
+            // eslint-disable-next-line no-console
+            console.error('sendRegistrationOtp failed:', {
+                message: err?.message,
+                code: err?.code,
+                status: err?.response?.status,
+                responseData: err?.response?.data,
+                isAxiosError: !!err?.isAxiosError,
+                errName: err?.name,
+            });
+
+            if (!err?.response) {
+                // No response from backend => likely network/CORS/mixed-content.
+                // eslint-disable-next-line no-console
+                console.error('sendRegistrationOtp: no response received (likely CORS or backend unreachable).');
+            }
+
+            throw err;
+        }
+    };
+
+    const verifyRegistrationOtp = async (username, otp) => {
+        try {
+            const response = await client.post("/register/verify-otp", {
+                username,
+                otp,
+            });
+            if (response.status === 200) {
+                return response.data.message;
+            }
+        } catch (err) {
+            console.log(err);
+            throw err;
+        }
+    };
 
     const handleLogin = async (username, password) => {
         try {
@@ -105,6 +157,8 @@ export const AuthProvider = ({ children }) => {
         userData,
         setUserData,
         handleRegister,
+        sendRegistrationOtp,
+        verifyRegistrationOtp,
         handleLogin,
         getUserHistory,
         addToUserHistory,

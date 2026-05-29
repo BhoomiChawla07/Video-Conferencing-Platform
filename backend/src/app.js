@@ -31,20 +31,8 @@ const io = connectToSocket(httpServer, {});
 
 app.set('port', process.env.PORT || 8001);
 app.use(cors({
-    origin: (origin, callback) => {
-        // allow requests with no origin (like mobile apps or curl)
-        if (!origin) return callback(null, true);
-
-        if (allowedOrigins.includes(origin)) return callback(null, true);
-
-        // allow local network IPs (http://192.168.x.x:3000 etc.)
-        if (/^https?:\/\/(192\.168\.|127\.|10\.)/.test(origin)) return callback(null, true);
-
-        return callback(new Error('Not allowed by CORS'), false);
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    origin: true,
+    credentials: true
 }));
 app.use(express.json({limit: '40kb'}));
 app.use(express.urlencoded({limit: '40kb' , extended: true}));

@@ -31,8 +31,7 @@ const io = connectToSocket(httpServer, {});
 
 app.set('port', process.env.PORT || 8001);
 app.use(cors({
-    origin: true,
-    credentials: true
+    origin: "*",
 }));
 app.use(express.json({limit: '40kb'}));
 app.use(express.urlencoded({limit: '40kb' , extended: true}));

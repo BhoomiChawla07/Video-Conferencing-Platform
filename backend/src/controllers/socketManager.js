@@ -19,6 +19,7 @@ export const connectToSocket = (httpServer, options) => {
     io.on('connection', (socket) => {
         console.log('A user connected: ' + socket.id);
         socket.on('joinRoom', (path) => {
+             console.log(`joinRoom received from ${socket.id} for room ${path}`);
            if (!connections[path]) {
                 connections[path] = [];
            }
@@ -41,10 +42,12 @@ export const connectToSocket = (httpServer, options) => {
         });
 
         socket.on("signal", (toId, message) => {
+            console.log(`signal from ${socket.id} to ${toId}:`, message?.sdp ? message.sdp.type : 'candidate');
             socket.to(toId).emit("signal", socket.id, message);
         });
 
         socket.on("chat-message", (data, sender) => {
+            console.log(`chat-message from ${socket.id} (${sender}):`, data);
             const [matchingRoom, found] = Object.entries(connections)
             .reduce(([room, isFound], [roomkey, roomValue]) => {
                if(!isFound && roomValue.includes(socket.id)) {

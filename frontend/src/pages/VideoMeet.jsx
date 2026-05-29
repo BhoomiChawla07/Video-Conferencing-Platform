@@ -49,6 +49,24 @@ export default function VideoMeetComponent() {
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState('');
   const [participantCount, setParticipantCount] = useState(1);
+  const [guestLink, setGuestLink] = useState(roomUrl);
+
+  // Fetch server IP and create shareable link
+  useEffect(() => {
+    const fetchServerInfo = async () => {
+      try {
+        const response = await fetch(`${server_url}/api/v1/server-info`);
+        const data = await response.json();
+        const ipBasedUrl = `http://${data.ip}:3000/meeting/${meetingId}`;
+        setGuestLink(ipBasedUrl);
+      } catch (error) {
+        console.log('Using localhost link:', error.message);
+        setGuestLink(roomUrl);
+      }
+    };
+    
+    fetchServerInfo();
+  }, [meetingId, roomUrl]);
 
   useEffect(() => {
     const initMedia = async () => {
@@ -99,12 +117,16 @@ export default function VideoMeetComponent() {
     const socket = io(server_url, {
       transports: ['websocket', 'polling'],
       path: '/socket.io',
+      autoConnect: true,
+      reconnectionAttempts: 5,
     });
     socketRef.current = socket;
 
     socket.on('connect', () => {
+      console.log('Socket connected:', socket.id, 'to', server_url);
       setSocketConnected(true);
       socket.emit('joinRoom', meetingId);
+      console.log('joinRoom emitted for', meetingId);
     });
 
     socket.on('disconnect', () => {
@@ -117,6 +139,7 @@ export default function VideoMeetComponent() {
     });
 
     socket.on('chat-message', (data, sender) => {
+      console.log('chat-message received', { data, sender });
       setMessages(prev => [...prev, { sender, data, time: new Date() }]);
     });
 
@@ -126,6 +149,7 @@ export default function VideoMeetComponent() {
         const pc = createPeerConnection(userId);
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
+        console.log('Sending offer to', userId);
         socket.emit('signal', userId, { sdp: pc.localDescription });
       }
     });
@@ -142,6 +166,7 @@ export default function VideoMeetComponent() {
     });
 
     socket.on('signal', async (fromId, message) => {
+      console.log('signal received from', fromId, message?.sdp?.type || 'candidate');
       const pc = createPeerConnection(fromId);
 
       if (message.sdp) {
@@ -157,6 +182,7 @@ export default function VideoMeetComponent() {
       if (message.candidate) {
         try {
           await pc.addIceCandidate(message.candidate);
+            console.log('Added remote ICE candidate from', fromId);
         } catch (error) {
           console.error('ICE candidate error', error);
         }
@@ -221,6 +247,7 @@ export default function VideoMeetComponent() {
 
     pc.onicecandidate = (event) => {
       if (event.candidate) {
+        console.log('Sending ICE candidate to', remoteSocketId);
         socketRef.current?.emit('signal', remoteSocketId, { candidate: event.candidate });
       }
     };
@@ -292,6 +319,7 @@ export default function VideoMeetComponent() {
   const handleSendMessage = () => {
     if (!messageText.trim() || !socketRef.current) return;
     const chatMessage = messageText.trim();
+    console.log('Sending chat-message:', chatMessage);
     socketRef.current.emit('chat-message', chatMessage, 'You');
     setMessages(prev => [...prev, { sender: 'You', data: chatMessage, time: new Date() }]);
     setMessageText('');
@@ -318,7 +346,16 @@ export default function VideoMeetComponent() {
           <Typography variant="body2" color="text.secondary" className={styles.roomLabel}>
             Share this link with your guests:
           </Typography>
-          <Box className={styles.roomLink}>{roomUrl}</Box>
+          <Box className={styles.roomLink}>
+            {guestLink}
+            <Button 
+              size="small" 
+              onClick={() => navigator.clipboard.writeText(guestLink)}
+              sx={{ ml: 1 }}
+            >
+              📋 Copy
+            </Button>
+          </Box>
         </Box>
         <Button variant="contained" color="error" onClick={handleLeaveMeeting}>
           Leave Meeting
